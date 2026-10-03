@@ -167,48 +167,77 @@ export const MeetingsView = () => {
 
       {/* Modal: Registrar Reunião */}
       {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-body">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--slate-900)' }}>
-                Registrar Reunião / Indicação
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="modal-body" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">
+                <i className="fa-solid fa-handshake" style={{ color: 'var(--brand-600)' }}></i>
+                Registrar Reunião 1-2-1
               </h2>
-              <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer' }}>
+              <button className="modal-close-btn" onClick={() => setShowModal(false)} title="Fechar">
                 <i className="fa-solid fa-xmark"></i>
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="grid g-1" style={{ gap: '14px' }}>
-              <div>
-                <label style={{ fontSize: '0.8rem', fontWeight: 700 }}>Quem indicou ou passou o contato? (Membro Origem)</label>
-                <select className="input-field" value={indicadorId} onChange={(e) => setIndicadorId(e.target.value)}>
-                  {members.map((m) => (
-                    <option key={m.id} value={m.id}>{m.nome} — {m.empresa}</option>
-                  ))}
-                </select>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="modal-grid-2">
+                <div className="form-group">
+                  <label className="form-label">
+                    <i className="fa-solid fa-user-check" style={{ color: 'var(--brand-600)', marginRight: '6px' }}></i>
+                    Membro Origem (Indicador)
+                  </label>
+                  <select className="input-field" value={indicadorId} onChange={(e) => setIndicadorId(e.target.value)}>
+                    {members.map((m) => (
+                      <option key={m.id} value={m.id}>{m.nome} — {m.empresa}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    <i className="fa-solid fa-user-group" style={{ color: 'var(--amber-600)', marginRight: '6px' }}></i>
+                    Membro Destino (Contato)
+                  </label>
+                  <select className="input-field" value={contatoId} onChange={(e) => setContatoId(e.target.value)}>
+                    {members.map((m) => (
+                      <option key={m.id} value={m.id}>{m.nome} — {m.empresa}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
-              <div>
-                <label style={{ fontSize: '0.8rem', fontWeight: 700 }}>Com quem é a reunião? (Membro Destino)</label>
-                <select className="input-field" value={contatoId} onChange={(e) => setContatoId(e.target.value)}>
-                  {members.map((m) => (
-                    <option key={m.id} value={m.id}>{m.nome} — {m.empresa}</option>
-                  ))}
-                </select>
+              <div className="modal-grid-2">
+                <div className="form-group">
+                  <label className="form-label">
+                    <i className="fa-regular fa-clock" style={{ color: 'var(--slate-600)', marginRight: '6px' }}></i>
+                    Data e Hora
+                  </label>
+                  <input
+                    type="datetime-local"
+                    className="input-field"
+                    value={dataHora}
+                    onChange={(e) => setDataHora(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    <i className="fa-solid fa-flag" style={{ color: 'var(--emerald-600)', marginRight: '6px' }}></i>
+                    Status da Reunião
+                  </label>
+                  <select className="input-field" value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <option value="Agendada">Agendada</option>
+                    <option value="Realizada">Realizada / Concluída</option>
+                    <option value="Em Acompanhamento">Em Acompanhamento</option>
+                  </select>
+                </div>
               </div>
 
-              <div>
-                <label style={{ fontSize: '0.8rem', fontWeight: 700 }}>Data e Hora da Reunião</label>
-                <input
-                  type="datetime-local"
-                  className="input-field"
-                  value={dataHora}
-                  onChange={(e) => setDataHora(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label style={{ fontSize: '0.8rem', fontWeight: 700 }}>Local do Encontro</label>
+              <div className="form-group">
+                <label className="form-label">
+                  <i className="fa-solid fa-location-dot" style={{ color: 'var(--rose-600)', marginRight: '6px' }}></i>
+                  Local do Encontro
+                </label>
                 <input
                   type="text"
                   className="input-field"
@@ -218,29 +247,29 @@ export const MeetingsView = () => {
                 />
               </div>
 
-              <div>
-                <label style={{ fontSize: '0.8rem', fontWeight: 700 }}>Status</label>
-                <select className="input-field" value={status} onChange={(e) => setStatus(e.target.value)}>
-                  <option value="Agendada">Agendada</option>
-                  <option value="Realizada">Realizada / Concluída</option>
-                  <option value="Em Acompanhamento">Em Acompanhamento</option>
-                </select>
-              </div>
-
-              <div>
-                <label style={{ fontSize: '0.8rem', fontWeight: 700 }}>Observações ou Assunto</label>
+              <div className="form-group">
+                <label className="form-label">
+                  <i className="fa-solid fa-file-pen" style={{ color: 'var(--slate-600)', marginRight: '6px' }}></i>
+                  Observações ou Pauta do Encontro
+                </label>
                 <textarea
                   className="input-field"
                   rows="3"
-                  placeholder="Detalhes da indicação, objetivo da reunião..."
+                  style={{ resize: 'vertical', minHeight: '80px' }}
+                  placeholder="Detalhes da indicação, objetivo da reunião 1-2-1..."
                   value={observacao}
                   onChange={(e) => setObservacao(e.target.value)}
                 />
               </div>
 
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '10px' }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancelar</button>
-                <button type="submit" className="btn btn-primary">Salvar Reunião</button>
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '12px', paddingTop: '16px', borderTop: '1px solid var(--slate-100)' }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                  Cancelar
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  <i className="fa-solid fa-check" style={{ marginRight: '6px' }}></i>
+                  Salvar Reunião
+                </button>
               </div>
             </form>
           </div>
