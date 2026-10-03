@@ -106,7 +106,8 @@ function seedData() {
 
   // Verticais
   const insertVertical = db.prepare('INSERT INTO verticais (id, nome, cor, descricao, cadeiras) VALUES (?, ?, ?, ?, ?)');
-  insertVertical.run('juridico', 'Jurídico & Compliance', 'blue', 'Direito previdenciário, bancário, saúde, trabalhista e compliance contratual.', 4);
+  insertVertical.run('tecnologia', 'Tecnologia & Inovação Digital', 'blue', 'Automação de processos com IA, desenvolvimento de software, agentes autônomos e transformação digital.', 1);
+  insertVertical.run('juridico' , 'Jurídico & Compliance', 'blue', 'Direito previdenciário, bancário, saúde, trabalhista e compliance contratual.', 4);
   insertVertical.run('contabil', 'Contábil & Financeiro', 'emerald', 'Contabilidade consultiva, perícia financeira e gestão BPO.', 3);
   insertVertical.run('marketing', 'Marketing, RH & Treinamento', 'violet', 'Posicionamento digital, tráfego pago, treinamento comercial e gestão comportamental.', 4);
   insertVertical.run('saude_sst', 'Saúde, Ergonomia & Seguros', 'amber', 'Saúde ocupacional, prevenção de passivos, seguros de vida e planejamento financeiro.', 2);

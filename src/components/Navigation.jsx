@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 const LOGO_URL = 'https://raw.githubusercontent.com/KeyCoreSH/stickers-keycore/main/KeyCore_146_stickers_PNG_HD_transparentes/PNG/09_build_better/KC09-01.png';
 
-export const Navigation = ({ currentPath, setPath }) => {
+export const Navigation = ({ currentPath, setPath, user, onLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const mainNavItems = [
@@ -127,9 +127,44 @@ export const Navigation = ({ currentPath, setPath }) => {
         </nav>
 
         {/* Sidebar Footer */}
-        <div className="sidebar-footer">
-          <div>BNI PE JUNTOS &copy; 2026</div>
-          <div style={{ color: 'var(--brand-600)', fontWeight: 600, marginTop: '2px' }}>Tecnologia que devolve tempo.</div>
+        <div className="sidebar-footer" style={{ borderTop: '1px solid var(--slate-200)', paddingTop: '14px', marginTop: 'auto' }}>
+          {user && (
+            <div style={{ marginBottom: '12px', background: 'var(--slate-50)', padding: '10px 12px', borderRadius: '10px', border: '1px solid var(--slate-200)' }}>
+              <div style={{ fontWeight: 800, fontSize: '0.85rem', color: 'var(--slate-900)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <i className="fa-solid fa-user-gear" style={{ color: 'var(--brand-600)' }}></i>
+                {user.name}
+              </div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--slate-500)', marginTop: '2px', wordBreak: 'break-all' }}>
+                {user.email}
+              </div>
+            </div>
+          )}
+
+          <button
+            onClick={onLogout}
+            className="btn btn-secondary"
+            style={{
+              width: '100%',
+              fontSize: '0.8rem',
+              padding: '8px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              color: 'var(--rose-700)',
+              borderColor: 'var(--rose-200)',
+              background: 'var(--rose-50)',
+              fontWeight: 700,
+              cursor: 'pointer',
+              marginBottom: '10px'
+            }}
+          >
+            <i className="fa-solid fa-right-from-bracket"></i>
+            Sair do Painel
+          </button>
+
+          <div style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>BNI PE JUNTOS &copy; 2026</div>
+          <div style={{ color: 'var(--brand-600)', fontWeight: 600, fontSize: '0.75rem', marginTop: '2px' }}>Tecnologia que devolve tempo.</div>
         </div>
       </aside>
     </>

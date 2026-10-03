@@ -13,6 +13,49 @@ app.use(bodyParser.json());
 // Serve static assets built by Vite in dist/
 app.use(express.static(path.join(__dirname, '../dist')));
 
+// Authentication Endpoint
+app.post('/api/login', (req, res) => {
+  const { email, password } = req.body || {};
+  if (!email || !password) {
+    return res.status(400).json({ success: false, message: 'Informe o e-mail e a senha.' });
+  }
+
+  const normalizedEmail = String(email).trim().toLowerCase();
+  if (normalizedEmail === 'geriofilho@gmail.com' && password === 'R0ger!n20100') {
+    return res.json({
+      success: true,
+      token: 'keycore_bni_token_master_rogerio_2026',
+      user: {
+        name: 'Rogério Alencar Filho',
+        email: 'Geriofilho@gmail.com',
+        role: 'Founder & CEO KeyCore Tech Hub'
+      }
+    });
+  }
+
+  return res.status(401).json({ success: false, message: 'E-mail ou senha incorretos.' });
+});
+
+// POST /api/verticais — Add new vertical dynamically
+app.post('/api/verticais', (req, res) => {
+  try {
+    const { id, nome, cor, descricao } = req.body || {};
+    if (!nome) {
+      return res.status(400).json({ error: 'O nome da vertical é obrigatório.' });
+    }
+    const verticalId = id || nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '_');
+    const color = cor || 'blue';
+    const desc = descricao || '';
+
+    const stmt = db.prepare('INSERT OR REPLACE INTO verticais (id, nome, cor, descricao, cadeiras) VALUES (?, ?, ?, ?, ?)');
+    stmt.run(verticalId, nome, color, desc, 0);
+
+    res.json({ success: true, vertical: { id: verticalId, nome, cor: color, descricao: desc, cadeiras: 0 } });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // API Endpoints
 
 // GET /api/meta
