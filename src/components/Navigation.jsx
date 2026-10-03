@@ -5,29 +5,47 @@ const LOGO_URL = 'https://raw.githubusercontent.com/KeyCoreSH/stickers-keycore/m
 export const Navigation = ({ currentPath, setPath }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const navItems = [
+  const mainNavItems = [
     { label: 'Visão Geral', path: '/', icon: 'fa-chart-pie' },
-    { label: 'Membros', path: '/membros', icon: 'fa-users' },
-    { label: 'Reuniões & Referências', path: '/reunioes', icon: 'fa-calendar-check' },
+    { label: 'Membros & Pitches', path: '/membros', icon: 'fa-users' },
+    { label: 'Reuniões & Indicações', path: '/reunioes', icon: 'fa-calendar-check' },
     { label: 'Grafo de Conexões', path: '/grafo', icon: 'fa-diagram-project' },
-    { label: 'Análise de Fit', path: '/fit', icon: 'fa-bullseye' },
-    { label: 'O Grupo BNI', path: '/grupo', icon: 'fa-people-group' }
+    { label: 'Matriz de Fit & Automações', path: '/fit', icon: 'fa-bullseye' }
+  ];
+
+  const guideNavItems = [
+    { label: 'O Grupo BNI Juntos', path: '/grupo', icon: 'fa-people-group' },
+    { label: 'Givers Gain® & 7 Valores', path: '/grupo#givers-gain', icon: 'fa-handshake-angle' },
+    { label: 'Método V-C-R', path: '/grupo#metodo', icon: 'fa-arrow-trend-up' },
+    { label: 'Estrutura & Cargos', path: '/grupo#estrutura', icon: 'fa-sitemap' }
   ];
 
   const handleNavClick = (path) => {
-    setPath(path);
+    const [basePath, hash] = path.split('#');
+    setPath(basePath);
     window.history.pushState({}, '', path);
     setIsOpen(false);
+
+    if (hash) {
+      setTimeout(() => {
+        const el = document.getElementById(hash);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
   };
 
   const isItemActive = (itemPath) => {
     const p = currentPath.toLowerCase();
-    if (itemPath === '/' && (p === '/' || p === '/index.html' || p === '')) return true;
-    if (itemPath === '/membros' && (p.includes('/membros') || p.includes('/membros.html'))) return true;
-    if (itemPath === '/reunioes' && (p.includes('/reunioes') || p.includes('/reunioes.html'))) return true;
-    if (itemPath === '/grafo' && (p.includes('/grafo') || p.includes('/grafo.html'))) return true;
-    if (itemPath === '/fit' && (p.includes('/fit') || p.includes('/fit.html'))) return true;
-    if (itemPath === '/grupo' && (p.includes('/grupo') || p.includes('/grupo.html'))) return true;
+    const [basePath] = itemPath.toLowerCase().split('#');
+
+    if (basePath === '/' && (p === '/' || p === '/index.html' || p === '')) return true;
+    if (basePath === '/membros' && p.includes('/membros')) return true;
+    if (basePath === '/reunioes' && p.includes('/reunioes')) return true;
+    if (basePath === '/grafo' && p.includes('/grafo')) return true;
+    if (basePath === '/fit' && p.includes('/fit')) return true;
+    if (basePath === '/grupo' && p.includes('/grupo')) return true;
     return false;
   };
 
@@ -39,66 +57,90 @@ export const Navigation = ({ currentPath, setPath }) => {
           <img src={LOGO_URL} alt="KeyCore Logo" style={{ height: '32px', width: 'auto' }} />
           <span>BNI PE JUNTOS</span>
         </div>
-        <button
-          className="menu-toggle"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Abrir Menu"
-        >
+        <button className="menu-toggle" onClick={() => setIsOpen(!isOpen)} aria-label="Abrir menu">
           <i className={`fa-solid ${isOpen ? 'fa-xmark' : 'fa-bars'}`}></i>
         </button>
       </header>
 
-      {/* Backdrop Overlay for Mobile Drawer */}
+      {/* Backdrop Overlay for Mobile */}
       {isOpen && (
         <div
+          onClick={() => setIsOpen(false)}
           style={{
             position: 'fixed',
-            top: 0, left: 0, right: 0, bottom: 0,
-            background: 'rgba(15,23,42,0.5)',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.4)',
             backdropFilter: 'blur(2px)',
             zIndex: 190
           }}
-          onClick={() => setIsOpen(false)}
         />
       )}
 
-      {/* Sidebar Navigation */}
+      {/* Off-Canvas Sidebar */}
       <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
-        <div className="sidebar-header">
-          <div className="brand-title">
-            <img src={LOGO_URL} alt="KeyCore Logo" style={{ height: '40px', width: 'auto' }} />
-            <div>
-              <div>BNI PE JUNTOS</div>
-              <div className="brand-subtitle">KeyCore Tech Hub</div>
-            </div>
+        <div className="brand-header">
+          <img src={LOGO_URL} alt="KeyCore Tech Hub Logo" style={{ height: '40px', width: 'auto' }} />
+          <div>
+            <div className="brand-title">BNI PE JUNTOS</div>
+            <div className="brand-subtitle">KeyCore Tech Hub</div>
           </div>
         </div>
 
-        <nav className="sidebar-nav">
-          {navItems.map((item) => {
-            const active = isItemActive(item.path);
-            return (
-              <a
-                key={item.path}
-                href={item.path}
-                className={`nav-item ${active ? 'active' : ''}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick(item.path);
-                }}
-              >
-                <i className={`fa-solid ${item.icon}`} style={{ width: '20px' }}></i>
-                <span>{item.label}</span>
-              </a>
-            );
-          })}
+        <nav style={{ padding: '16px 0', flex: 1, overflowY: 'auto' }}>
+          {/* Section 1: Ecossistema & Operação */}
+          <div style={{ padding: '0 20px 8px', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--slate-400)', letterSpacing: '0.05em' }}>
+            Navegação &amp; Operação
+          </div>
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+            {mainNavItems.map((item) => {
+              const active = isItemActive(item.path);
+              return (
+                <li key={item.path}>
+                  <a
+                    href={item.path}
+                    className={`nav-link ${active ? 'active' : ''}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleNavClick(item.path);
+                    }}
+                  >
+                    <i className={`fa-solid ${item.icon}`}></i>
+                    <span>{item.label}</span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+
+          {/* Section 2: Guia Institucional */}
+          <div style={{ padding: '20px 20px 8px', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--slate-400)', letterSpacing: '0.05em' }}>
+            Método &amp; Guia BNI
+          </div>
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+            {guideNavItems.map((item) => {
+              return (
+                <li key={item.path}>
+                  <a
+                    href={item.path}
+                    className="nav-link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleNavClick(item.path);
+                    }}
+                  >
+                    <i className={`fa-solid ${item.icon}`}></i>
+                    <span>{item.label}</span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
         </nav>
 
-        <div className="sidebar-footer">
-          <div>Plataforma de Ecossistema</div>
-          <div style={{ fontWeight: 700, color: 'var(--slate-600)', marginTop: '2px' }}>
-            KeyCore Tech Hub v2.0
-          </div>
+        {/* Sidebar Footer */}
+        <div style={{ padding: '16px 20px', borderTop: '1px solid var(--slate-100)', fontSize: '0.75rem', color: 'var(--slate-500)' }}>
+          <div>BNI PE JUNTOS &copy; 2026</div>
+          <div style={{ color: 'var(--brand-600)', fontWeight: 600 }}>Tecnologia que devolve tempo.</div>
         </div>
       </aside>
     </>
