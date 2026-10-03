@@ -46,20 +46,21 @@ export const Navigation = ({ currentPath, setPath }) => {
         </button>
       </header>
 
-      {/* Backdrop for Mobile */}
+      {/* Backdrop Overlay for Mobile Drawer */}
       {isOpen && (
         <div
           style={{
             position: 'fixed',
             top: 0, left: 0, right: 0, bottom: 0,
             background: 'rgba(15,23,42,0.5)',
-            zIndex: 95
+            backdropFilter: 'blur(2px)',
+            zIndex: 190
           }}
           onClick={() => setIsOpen(false)}
         />
       )}
 
-      {/* Sidebar Navigation */}
+      {/* Sidebar Navigation (Off-canvas on mobile, fixed on desktop) */}
       <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <div className="brand-title">
