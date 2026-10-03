@@ -64,17 +64,19 @@ export const Navigation = ({ currentPath, setPath }) => {
 
       {/* Off-Canvas Sidebar */}
       <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
-        <div className="brand-header">
-          <img src={LOGO_URL} alt="KeyCore Tech Hub Logo" style={{ height: '40px', width: 'auto' }} />
-          <div>
-            <div className="brand-title">BNI PE JUNTOS</div>
-            <div className="brand-subtitle">KeyCore Tech Hub</div>
+        <div className="sidebar-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <img src={LOGO_URL} alt="KeyCore Tech Hub Logo" style={{ height: '40px', width: 'auto' }} />
+            <div>
+              <div className="brand-title">BNI PE JUNTOS</div>
+              <div className="brand-subtitle">KeyCore Tech Hub</div>
+            </div>
           </div>
         </div>
 
-        <nav style={{ padding: '16px 0', flex: 1, overflowY: 'auto' }}>
+        <nav className="sidebar-nav">
           {/* Section 1: Ecossistema & Operação */}
-          <div style={{ padding: '0 20px 8px', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--slate-400)', letterSpacing: '0.05em' }}>
+          <div className="nav-section-title">
             Navegação &amp; Operação
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
@@ -99,7 +101,7 @@ export const Navigation = ({ currentPath, setPath }) => {
           </ul>
 
           {/* Section 2: Guia Institucional */}
-          <div style={{ padding: '20px 20px 8px', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--slate-400)', letterSpacing: '0.05em' }}>
+          <div className="nav-section-title" style={{ marginTop: '16px' }}>
             Método &amp; Institucional
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
@@ -125,9 +127,9 @@ export const Navigation = ({ currentPath, setPath }) => {
         </nav>
 
         {/* Sidebar Footer */}
-        <div style={{ padding: '16px 20px', borderTop: '1px solid var(--slate-100)', fontSize: '0.75rem', color: 'var(--slate-500)' }}>
+        <div className="sidebar-footer">
           <div>BNI PE JUNTOS &copy; 2026</div>
-          <div style={{ color: 'var(--brand-600)', fontWeight: 600 }}>Tecnologia que devolve tempo.</div>
+          <div style={{ color: 'var(--brand-600)', fontWeight: 600, marginTop: '2px' }}>Tecnologia que devolve tempo.</div>
         </div>
       </aside>
     </>
