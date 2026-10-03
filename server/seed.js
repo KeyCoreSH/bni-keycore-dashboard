@@ -388,7 +388,9 @@ function seedData() {
     }
   }
 
-    insertEdge.run('paula', 'luiz', 'sinergia', 'BPO Financeiro (Paula) + Posicionamento/Patrocínios > R$ 80k (Luiz)');
+      insertEdge.run('keycore', 'paula', 'recomendacao', 'Recomendação KeyCore: Agente IA para Conciliação Bancária & Dashboards Financeiros para Yellowfin Consult');
+  insertEdge.run('paula', 'keycore', 'sinergia', 'Sinergia BPO + IA: Yellowfin Consult encaminha clientes de BPO para automação de ERP KeyCore');
+  insertEdge.run('paula', 'luiz', 'sinergia', 'BPO Financeiro (Paula) + Posicionamento/Patrocínios > R$ 80k (Luiz)');
   insertEdge.run('paula', 'pedro', 'sinergia', 'BPO Financeiro (Paula) + Contabilidade Consultiva (Pedro)');
   insertEdge.run('marina', 'lucas', 'sinergia', 'Previdenciário + Bancário');
   insertEdge.run('debora', 'bruno', 'sinergia', 'Arquitetura + Energia Solar');

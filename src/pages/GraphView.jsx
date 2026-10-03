@@ -17,6 +17,7 @@ export const GraphView = () => {
     oferta: true,
     sinergia: true,
     reuniao: true,
+    recomendacao: true,
     vertical: true
   });
 
@@ -126,6 +127,24 @@ export const GraphView = () => {
           }
         },
         {
+          selector: 'edge[tipo="recomendacao"]',
+          style: {
+            'line-color': '#7c3aed',
+            'target-arrow-color': '#7c3aed',
+            'width': 3.5,
+            'line-style': 'dashed',
+            'target-arrow-shape': 'triangle',
+            'arrow-scale': 1.3,
+            'font-size': '10px',
+            'font-weight': '700',
+            'color': '#6d28d9',
+            'text-background-color': '#f5f3ff',
+            'text-background-opacity': 1,
+            'text-background-padding': '3px',
+            'z-index': 990
+          }
+        },
+        {
           selector: 'edge[tipo="reuniao"]',
           style: {
             'line-color': '#d97706',
@@ -228,6 +247,15 @@ export const GraphView = () => {
                   onChange={(e) => setEdgeTypes({ ...edgeTypes, oferta: e.target.checked })}
                 />
                 ⚡ Automações KeyCore (Azul)
+              </label>
+
+              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', background: 'var(--violet-50)', padding: '4px 10px', borderRadius: '6px', border: '1px solid var(--violet-200)', fontWeight: 700, color: 'var(--violet-800)' }}>
+                <input
+                  type="checkbox"
+                  checked={edgeTypes.recomendacao}
+                  onChange={(e) => setEdgeTypes({ ...edgeTypes, recomendacao: e.target.checked })}
+                />
+                💡 Recomendações KeyCore (Roxo)
               </label>
             </div>
 
