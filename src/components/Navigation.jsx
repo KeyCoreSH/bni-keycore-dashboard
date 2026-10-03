@@ -10,42 +10,28 @@ export const Navigation = ({ currentPath, setPath }) => {
     { label: 'Membros & Pitches', path: '/membros', icon: 'fa-users' },
     { label: 'Reuniões & Indicações', path: '/reunioes', icon: 'fa-calendar-check' },
     { label: 'Grafo de Conexões', path: '/grafo', icon: 'fa-diagram-project' },
-    { label: 'Matriz de Fit & Automações', path: '/fit', icon: 'fa-bullseye' }
+    { label: 'Matriz de Fit', path: '/fit', icon: 'fa-bullseye' }
   ];
 
-  const guideNavItems = [
-    { label: 'O Grupo BNI Juntos', path: '/grupo', icon: 'fa-people-group' },
-    { label: 'Givers Gain® & 7 Valores', path: '/grupo#givers-gain', icon: 'fa-handshake-angle' },
-    { label: 'Método V-C-R', path: '/grupo#metodo', icon: 'fa-arrow-trend-up' },
-    { label: 'Estrutura & Cargos', path: '/grupo#estrutura', icon: 'fa-sitemap' }
+  const groupNavItems = [
+    { label: 'O Grupo BNI PE JUNTOS', path: '/grupo', icon: 'fa-people-group' }
   ];
 
   const handleNavClick = (path) => {
-    const [basePath, hash] = path.split('#');
-    setPath(basePath);
+    setPath(path);
     window.history.pushState({}, '', path);
     setIsOpen(false);
-
-    if (hash) {
-      setTimeout(() => {
-        const el = document.getElementById(hash);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const isItemActive = (itemPath) => {
     const p = currentPath.toLowerCase();
-    const [basePath] = itemPath.toLowerCase().split('#');
-
-    if (basePath === '/' && (p === '/' || p === '/index.html' || p === '')) return true;
-    if (basePath === '/membros' && p.includes('/membros')) return true;
-    if (basePath === '/reunioes' && p.includes('/reunioes')) return true;
-    if (basePath === '/grafo' && p.includes('/grafo')) return true;
-    if (basePath === '/fit' && p.includes('/fit')) return true;
-    if (basePath === '/grupo' && p.includes('/grupo')) return true;
+    if (itemPath === '/' && (p === '/' || p === '/index.html' || p === '')) return true;
+    if (itemPath === '/membros' && p.includes('/membros')) return true;
+    if (itemPath === '/reunioes' && p.includes('/reunioes')) return true;
+    if (itemPath === '/grafo' && p.includes('/grafo')) return true;
+    if (itemPath === '/fit' && p.includes('/fit')) return true;
+    if (itemPath === '/grupo' && p.includes('/grupo')) return true;
     return false;
   };
 
@@ -114,15 +100,16 @@ export const Navigation = ({ currentPath, setPath }) => {
 
           {/* Section 2: Guia Institucional */}
           <div style={{ padding: '20px 20px 8px', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--slate-400)', letterSpacing: '0.05em' }}>
-            Método &amp; Guia BNI
+            Método &amp; Institucional
           </div>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-            {guideNavItems.map((item) => {
+            {groupNavItems.map((item) => {
+              const active = isItemActive(item.path);
               return (
                 <li key={item.path}>
                   <a
                     href={item.path}
-                    className="nav-link"
+                    className={`nav-link ${active ? 'active' : ''}`}
                     onClick={(e) => {
                       e.preventDefault();
                       handleNavClick(item.path);
