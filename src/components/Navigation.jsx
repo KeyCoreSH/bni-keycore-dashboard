@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+const LOGO_URL = 'https://raw.githubusercontent.com/KeyCoreSH/stickers-keycore/main/KeyCore_146_stickers_PNG_HD_transparentes/PNG/09_build_better/KC09-01.png';
+
 export const Navigation = ({ currentPath, setPath }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -34,7 +36,7 @@ export const Navigation = ({ currentPath, setPath }) => {
       {/* Top Bar for Mobile Screens */}
       <header className="top-navbar">
         <div className="brand-title">
-          <i className="fa-solid fa-layer-group" style={{ color: 'var(--brand-600)' }}></i>
+          <img src={LOGO_URL} alt="KeyCore Logo" style={{ height: '32px', width: 'auto' }} />
           <span>BNI PE JUNTOS</span>
         </div>
         <button
@@ -60,14 +62,16 @@ export const Navigation = ({ currentPath, setPath }) => {
         />
       )}
 
-      {/* Sidebar Navigation (Off-canvas on mobile, fixed on desktop) */}
+      {/* Sidebar Navigation */}
       <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <div className="brand-title">
-            <i className="fa-solid fa-layer-group" style={{ color: 'var(--brand-600)', fontSize: '1.4rem' }}></i>
-            <span>BNI PE JUNTOS</span>
+            <img src={LOGO_URL} alt="KeyCore Logo" style={{ height: '40px', width: 'auto' }} />
+            <div>
+              <div>BNI PE JUNTOS</div>
+              <div className="brand-subtitle">KeyCore Tech Hub</div>
+            </div>
           </div>
-          <div className="brand-subtitle">Ecossistema &amp; KeyCore Tech Hub</div>
         </div>
 
         <nav className="sidebar-nav">
