@@ -126,6 +126,20 @@ function seedData() {
 
   const membersList = [
     {
+      id: 'paula',
+      nome: 'Paula Ferreira',
+      empresa: 'Yellowfin Consult (@yellowfinconsult)',
+      especialidade: 'BPO Financeiro & Apoio Operacional à Gestão',
+      vertical: 'contabil',
+      papel: 'Membro',
+      pitch: 'Terceirização do financeiro (BPO financeiro), com apoio operacional para traduzir números em dados e contribuir para a gestão.',
+      fit: 'Excepcional',
+      fit_score: 94,
+      gargalo: 'Controle financeiro manual de clientes e acompanhamento de conciliações para empresas com patrocínio acima de R$ 80 mil.',
+      oferta: 'Agente IA para conciliação bancária automatizada e dashboard de dados financeiros em tempo real.',
+      equipe: 'lobo'
+    },
+    {
       id: 'marina',
       nome: 'Marina',
       empresa: 'Advocacia Previdenciária',
@@ -374,6 +388,8 @@ function seedData() {
     }
   }
 
+    insertEdge.run('paula', 'luiz', 'sinergia', 'BPO Financeiro (Paula) + Posicionamento/Patrocínios > R$ 80k (Luiz)');
+  insertEdge.run('paula', 'pedro', 'sinergia', 'BPO Financeiro (Paula) + Contabilidade Consultiva (Pedro)');
   insertEdge.run('marina', 'lucas', 'sinergia', 'Previdenciário + Bancário');
   insertEdge.run('debora', 'bruno', 'sinergia', 'Arquitetura + Energia Solar');
   insertEdge.run('henrique', 'danilo', 'sinergia', 'Treinamento de Vendas + Tráfego Pago');

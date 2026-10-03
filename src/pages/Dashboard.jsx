@@ -40,7 +40,7 @@ export const Dashboard = ({ onNavigate }) => {
           <div className="card">
             <div style={{ fontSize: '0.8rem', color: 'var(--slate-500)', fontWeight: 700 }}>Cadeiras Mapeadas</div>
             <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--slate-900)' }}>
-              16 <small style={{ fontSize: '0.9rem', color: 'var(--slate-500)' }}>de 20</small>
+              17 <small style={{ fontSize: '0.9rem', color: 'var(--slate-500)' }}>de 20</small>
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--slate-500)', marginTop: '4px' }}>Meta para lançamento oficial do grupo.</div>
           </div>
