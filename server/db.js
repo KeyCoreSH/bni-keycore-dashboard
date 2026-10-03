@@ -66,8 +66,7 @@ function initDb() {
       member_id TEXT NOT NULL,
       publico_id TEXT NOT NULL,
       PRIMARY KEY (member_id, publico_id),
-      FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE CASCADE,
-      FOREIGN KEY (publico_id) REFERENCES publicos(id) ON DELETE CASCADE
+      FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS graph_edges (
@@ -97,6 +96,19 @@ function initDb() {
       cargo TEXT NOT NULL,
       descricao TEXT NOT NULL,
       responsavel TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS reunioes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      indicador_id TEXT NOT NULL,
+      contato_id TEXT NOT NULL,
+      data_hora DATETIME NOT NULL,
+      local TEXT NOT NULL,
+      status TEXT DEFAULT 'Agendada',
+      observacao TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (indicador_id) REFERENCES members(id),
+      FOREIGN KEY (contato_id) REFERENCES members(id)
     );
   `);
 }

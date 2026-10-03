@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Navigation } from './components/Navigation';
 import { Dashboard } from './pages/Dashboard';
 import { MembersView } from './pages/MembersView';
+import { MeetingsView } from './pages/MeetingsView';
 import { GraphView } from './pages/GraphView';
 import { FitAnalysis } from './pages/FitAnalysis';
 import { GroupGuide } from './pages/GroupGuide';
@@ -22,6 +23,9 @@ export const App = () => {
 
     if (path.includes('/membros') || path.includes('/membros.html')) {
       return <MembersView />;
+    }
+    if (path.includes('/reunioes') || path.includes('/reunioes.html')) {
+      return <MeetingsView />;
     }
     if (path.includes('/grafo') || path.includes('/grafo.html')) {
       return <GraphView />;

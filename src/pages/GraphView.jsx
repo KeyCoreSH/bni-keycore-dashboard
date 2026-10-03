@@ -15,6 +15,7 @@ export const GraphView = () => {
   const [edgeTypes, setEdgeTypes] = useState({
     oferta: true,
     sinergia: true,
+    reuniao: true,
     mercado: true
   });
 
@@ -105,6 +106,15 @@ export const GraphView = () => {
                 'line-color': '#059669',
                 'target-arrow-color': '#059669'
               }
+            },
+            {
+              selector: 'edge[tipo="reuniao"]',
+              style: {
+                'line-color': '#d97706',
+                'target-arrow-color': '#d97706',
+                'width': 4,
+                'line-style': 'solid'
+              }
             }
           ],
           layout: {
@@ -126,65 +136,50 @@ export const GraphView = () => {
   return (
     <div>
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--slate-900)' }}>Grafo de Conexões &amp; Sinergias</h1>
+        <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--slate-900)' }}>Grafo Interativo de Conexões &amp; Indicações</h1>
         <p style={{ fontSize: '0.9rem', color: 'var(--slate-600)' }}>
-          Visualização interativa das verticais, membros do BNI PE JUNTOS, públicos compartilhados e ofertas de automação da KeyCore.
+          Visualização multidimensional de nós: KeyCore (Hub), Verticais, Membros, Indicações de Reuniões 1-2-1 e Públicos-Alvo.
         </p>
       </div>
 
-      <div className="grid g-2" style={{ gridTemplateColumns: selectedNode ? '1fr 300px' : '1fr' }}>
-        <div className="card" style={{ padding: '12px' }}>
-          <div style={{ display: 'flex', gap: '16px', marginBottom: '12px', flexWrap: 'wrap', fontSize: '0.8rem', fontWeight: 700 }}>
-            <div>
-              <i className="fa-solid fa-circle" style={{ color: '#2563eb', marginRight: '4px' }}></i> L0 KeyCore Hub
+      <div style={{ display: 'grid', gridTemplateColumns: selectedNode ? '1fr 300px' : '1fr', gap: '20px' }}>
+        <div>
+          {/* Controls Bar */}
+          <div className="card" style={{ padding: '12px 16px', marginBottom: '16px', display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
+              <strong>Camadas:</strong>
+              <label><input type="checkbox" checked={layers.l0} onChange={(e) => setLayers({ ...layers, l0: e.target.checked })} /> KeyCore</label>
+              <label><input type="checkbox" checked={layers.l1} onChange={(e) => setLayers({ ...layers, l1: e.target.checked })} /> Verticais</label>
+              <label><input type="checkbox" checked={layers.l2} onChange={(e) => setLayers({ ...layers, l2: e.target.checked })} /> Membros</label>
             </div>
-            <div>
-              <i className="fa-solid fa-hexagon" style={{ color: '#059669', marginRight: '4px' }}></i> L1 Verticais
-            </div>
-            <div>
-              <i className="fa-solid fa-circle" style={{ color: '#059669', marginRight: '4px' }}></i> L2 Membros BNI
-            </div>
-            <div>
-              <i className="fa-solid fa-square" style={{ color: '#7c3aed', marginRight: '4px' }}></i> L3 Públicos Alvo
-            </div>
-            <div style={{ marginLeft: 'auto', fontStyle: 'italic', color: 'var(--slate-400)', fontWeight: 500 }}>
-              Clique em qualquer nó para ver detalhes.
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
+              <strong>Arestas:</strong>
+              <label><input type="checkbox" checked={edgeTypes.oferta} onChange={(e) => setEdgeTypes({ ...edgeTypes, oferta: e.target.checked })} /> Automações</label>
+              <label><input type="checkbox" checked={edgeTypes.sinergia} onChange={(e) => setEdgeTypes({ ...edgeTypes, sinergia: e.target.checked })} /> Sinergias</label>
+              <label><input type="checkbox" checked={edgeTypes.reuniao} onChange={(e) => setEdgeTypes({ ...edgeTypes, reuniao: e.target.checked })} /> Reuniões/Indicações</label>
             </div>
           </div>
 
-          <div ref={containerRef} id="cy-container"></div>
+          <div id="cy-container" ref={containerRef}></div>
         </div>
 
+        {/* Node Detail Drawer */}
         {selectedNode && (
-          <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span className="pill" style={{ textTransform: 'uppercase', fontSize: '0.7rem' }}>
-                  {selectedNode.type || 'Nó'}
-                </span>
-                <button className="menu-toggle" onClick={() => setSelectedNode(null)}><i className="fa-solid fa-xmark"></i></button>
+          <div className="card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <span className="badge badge-blue">{selectedNode.type}</span>
+              <button onClick={() => setSelectedNode(null)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                <i className="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--slate-900)' }}>{selectedNode.label}</h3>
+            {selectedNode.fit && (
+              <div style={{ marginTop: '8px', fontSize: '0.85rem', color: 'var(--emerald-600)', fontWeight: 700 }}>
+                Fit BNI: {selectedNode.fit}
               </div>
-
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--slate-900)', marginBottom: '8px' }}>
-                {selectedNode.label}
-              </h3>
-
-              {selectedNode.fit && (
-                <div style={{ marginBottom: '12px' }}>
-                  <span className="badge badge-emerald">Fit KeyCore: {selectedNode.fit}</span>
-                </div>
-              )}
-
-              {selectedNode.parent && (
-                <div style={{ fontSize: '0.8rem', color: 'var(--slate-600)', marginBottom: '8px' }}>
-                  <strong>Vertical:</strong> {selectedNode.parent}
-                </div>
-              )}
-            </div>
-
-            <div style={{ fontSize: '0.75rem', color: 'var(--slate-400)', borderTop: '1px solid var(--slate-100)', paddingTop: '8px' }}>
-              Conexão ativa no grafo do BNI PE JUNTOS.
-            </div>
+            )}
           </div>
         )}
       </div>

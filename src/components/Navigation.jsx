@@ -6,6 +6,7 @@ export const Navigation = ({ currentPath, setPath }) => {
   const navItems = [
     { label: 'Visão Geral', path: '/', icon: 'fa-chart-pie' },
     { label: 'Membros', path: '/membros', icon: 'fa-users' },
+    { label: 'Reuniões & Referências', path: '/reunioes', icon: 'fa-calendar-check' },
     { label: 'Grafo de Conexões', path: '/grafo', icon: 'fa-diagram-project' },
     { label: 'Análise de Fit', path: '/fit', icon: 'fa-bullseye' },
     { label: 'O Grupo BNI', path: '/grupo', icon: 'fa-people-group' }
@@ -21,6 +22,7 @@ export const Navigation = ({ currentPath, setPath }) => {
     const p = currentPath.toLowerCase();
     if (itemPath === '/' && (p === '/' || p === '/index.html' || p === '')) return true;
     if (itemPath === '/membros' && (p.includes('/membros') || p.includes('/membros.html'))) return true;
+    if (itemPath === '/reunioes' && (p.includes('/reunioes') || p.includes('/reunioes.html'))) return true;
     if (itemPath === '/grafo' && (p.includes('/grafo') || p.includes('/grafo.html'))) return true;
     if (itemPath === '/fit' && (p.includes('/fit') || p.includes('/fit.html'))) return true;
     if (itemPath === '/grupo' && (p.includes('/grupo') || p.includes('/grupo.html'))) return true;

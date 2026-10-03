@@ -10,6 +10,9 @@ const PORT = process.env.PORT || 8080;
 app.use(cors());
 app.use(bodyParser.json());
 
+// Serve static assets built by Vite in dist/
+app.use(express.static(path.join(__dirname, '../dist')));
+
 // API Endpoints
 
 // GET /api/meta
@@ -24,12 +27,14 @@ app.get('/api/meta', (req, res) => {
     const equipes = db.prepare('SELECT * FROM equipes').all();
     const verticais = db.prepare('SELECT * FROM verticais').all();
     const totalMembers = db.prepare('SELECT COUNT(*) as count FROM members').get().count;
+    const totalReunioes = db.prepare('SELECT COUNT(*) as count FROM reunioes').get().count;
 
     res.json({
       meta: metaObj,
       equipes,
       verticais,
-      totalMembers
+      totalMembers,
+      totalReunioes
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -71,20 +76,18 @@ app.get('/api/members', (req, res) => {
     }
     if (search) {
       query += ' AND (nome LIKE ? OR empresa LIKE ? OR especialidade LIKE ? OR pitch LIKE ?)';
-      const term = `%${search}%`;
-      params.push(term, term, term, term);
+      const s = `%${search}%`;
+      params.push(s, s, s, s);
     }
-
-    query += ' ORDER BY fit_score DESC, nome ASC';
 
     const members = db.prepare(query).all(...params);
 
     const fullMembers = members.map(m => {
       const redes = db.prepare('SELECT tipo, handle FROM member_redes WHERE member_id = ?').all(m.id);
       const publicos = db.prepare(`
-        SELECT p.id, p.nome, p.desc 
+        SELECT p.id, p.nome 
         FROM publicos p
-        JOIN membro_publico mp ON mp.publico_id = p.id
+        JOIN membro_publico mp ON p.id = mp.publico_id
         WHERE mp.member_id = ?
       `).all(m.id);
       return { ...m, redes, publicos };
@@ -101,27 +104,21 @@ app.get('/api/members/:id', (req, res) => {
   try {
     const { id } = req.params;
     const member = db.prepare('SELECT * FROM members WHERE id = ?').get(id);
-
     if (!member) {
       return res.status(404).json({ error: 'Membro não encontrado' });
     }
 
     const redes = db.prepare('SELECT tipo, handle FROM member_redes WHERE member_id = ?').all(id);
     const publicos = db.prepare(`
-      SELECT p.id, p.nome, p.desc 
+      SELECT p.id, p.nome 
       FROM publicos p
-      JOIN membro_publico mp ON mp.publico_id = p.id
+      JOIN membro_publico mp ON p.id = mp.publico_id
       WHERE mp.member_id = ?
     `).all(id);
 
-    const connections = db.prepare('SELECT * FROM graph_edges WHERE source = ? OR target = ?').all(id, id);
+    const edges = db.prepare('SELECT * FROM graph_edges WHERE source = ? OR target = ?').all(id, id);
 
-    res.json({
-      ...member,
-      redes,
-      publicos,
-      connections
-    });
+    res.json({ ...member, redes, publicos, edges });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -130,40 +127,15 @@ app.get('/api/members/:id', (req, res) => {
 // POST /api/members
 app.post('/api/members', (req, res) => {
   try {
-    const {
-      id, nome, empresa, especialidade, vertical, papel, pitch,
-      origem, fonte, fit, fit_score, gargalo, oferta, nat, equipe, redes, publicos
-    } = req.body;
+    const { id, nome, empresa, especialidade, vertical, equipe, pitch, gargalo, oferta, fit_score } = req.body;
+    const memberId = id || nome.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-    const memberId = id || nome.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    db.prepare(`
+      INSERT INTO members (id, nome, empresa, especialidade, vertical, equipe, pitch, gargalo, oferta, fit_score)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(memberId, nome, empresa, especialidade, vertical, equipe || 'lobo', pitch, gargalo, oferta, fit_score || 75);
 
-    const stmt = db.prepare(`
-      INSERT INTO members (
-        id, nome, empresa, especialidade, vertical, papel, pitch, origem, fonte, fit, fit_score, gargalo, oferta, nat, equipe
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    stmt.run(
-      memberId, nome, empresa, especialidade, vertical || 'marketing',
-      papel || 'Membro', pitch || '', origem || 'Interface Web', fonte || 'Manual',
-      fit || 'Médio', fit_score || 80, gargalo || '', oferta || '', nat || 'membro', equipe || 'Lobo'
-    );
-
-    if (Array.isArray(redes)) {
-      const stmtRede = db.prepare('INSERT INTO member_redes (member_id, tipo, handle) VALUES (?, ?, ?)');
-      for (const r of redes) {
-        if (r.tipo && r.handle) stmtRede.run(memberId, r.tipo, r.handle);
-      }
-    }
-
-    if (Array.isArray(publicos)) {
-      const stmtPub = db.prepare('INSERT INTO membro_publico (member_id, publico_id) VALUES (?, ?)');
-      for (const pId of publicos) {
-        stmtPub.run(memberId, pId);
-      }
-    }
-
-    res.status(201).json({ id: memberId, message: 'Membro criado com sucesso' });
+    res.json({ message: 'Membro criado com sucesso', id: memberId });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -173,31 +145,13 @@ app.post('/api/members', (req, res) => {
 app.put('/api/members/:id', (req, res) => {
   try {
     const { id } = req.params;
-    const {
-      nome, empresa, especialidade, vertical, papel, pitch,
-      fit, fit_score, gargalo, oferta, equipe
-    } = req.body;
+    const { nome, empresa, especialidade, vertical, equipe, pitch, gargalo, oferta, fit_score } = req.body;
 
-    const stmt = db.prepare(`
-      UPDATE members SET
-        nome = COALESCE(?, nome),
-        empresa = COALESCE(?, empresa),
-        especialidade = COALESCE(?, especialidade),
-        vertical = COALESCE(?, vertical),
-        papel = COALESCE(?, papel),
-        pitch = COALESCE(?, pitch),
-        fit = COALESCE(?, fit),
-        fit_score = COALESCE(?, fit_score),
-        gargalo = COALESCE(?, gargalo),
-        oferta = COALESCE(?, oferta),
-        equipe = COALESCE(?, equipe)
+    db.prepare(`
+      UPDATE members 
+      SET nome = ?, empresa = ?, especialidade = ?, vertical = ?, equipe = ?, pitch = ?, gargalo = ?, oferta = ?, fit_score = ?
       WHERE id = ?
-    `);
-
-    stmt.run(
-      nome, empresa, especialidade, vertical, papel, pitch,
-      fit, fit_score, gargalo, oferta, equipe, id
-    );
+    `).run(nome, empresa, especialidade, vertical, equipe, pitch, gargalo, oferta, fit_score, id);
 
     res.json({ message: 'Membro atualizado com sucesso' });
   } catch (err) {
@@ -211,6 +165,73 @@ app.delete('/api/members/:id', (req, res) => {
     const { id } = req.params;
     db.prepare('DELETE FROM members WHERE id = ?').run(id);
     res.json({ message: 'Membro removido com sucesso' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/reunioes
+app.get('/api/reunioes', (req, res) => {
+  try {
+    const reunioes = db.prepare(`
+      SELECT 
+        r.*,
+        m1.nome as indicador_nome,
+        m1.empresa as indicador_empresa,
+        m1.especialidade as indicador_especialidade,
+        m2.nome as contato_nome,
+        m2.empresa as contato_empresa,
+        m2.especialidade as contato_especialidade
+      FROM reunioes r
+      JOIN members m1 ON r.indicador_id = m1.id
+      JOIN members m2 ON r.contato_id = m2.id
+      ORDER BY r.data_hora DESC
+    `).all();
+
+    res.json(reunioes);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/reunioes
+app.post('/api/reunioes', (req, res) => {
+  try {
+    const { indicador_id, contato_id, data_hora, local, status, observacao } = req.body;
+
+    if (!indicador_id || !contato_id || !data_hora || !local) {
+      return res.status(400).json({ error: 'Campos indicador_id, contato_id, data_hora e local são obrigatórios.' });
+    }
+
+    const info = db.prepare(`
+      INSERT INTO reunioes (indicador_id, contato_id, data_hora, local, status, observacao)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(indicador_id, contato_id, data_hora, local, status || 'Agendada', observacao || '');
+
+    const m1 = db.prepare('SELECT nome FROM members WHERE id = ?').get(indicador_id);
+    const m2 = db.prepare('SELECT nome FROM members WHERE id = ?').get(contato_id);
+
+    const edgeLabel = `Reunião/Indicação: ${m1 ? m1.nome : indicador_id} ➔ ${m2 ? m2.nome : contato_id} (${local})`;
+
+    db.prepare('INSERT INTO graph_edges (source, target, tipo, label) VALUES (?, ?, ?, ?)').run(
+      indicador_id,
+      contato_id,
+      'reuniao',
+      edgeLabel
+    );
+
+    res.json({ message: 'Reunião/Indicação registrada com sucesso!', id: info.lastInsertRowid });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/reunioes/:id
+app.delete('/api/reunioes/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    db.prepare('DELETE FROM reunioes WHERE id = ?').run(id);
+    res.json({ message: 'Registro de reunião removido com sucesso.' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -245,18 +266,24 @@ app.get('/api/graph', (req, res) => {
 app.get('/api/fit', (req, res) => {
   try {
     const members = db.prepare('SELECT id, nome, empresa, especialidade, vertical, fit, fit_score, gargalo, oferta FROM members ORDER BY fit_score DESC').all();
-    const verticais = db.prepare('SELECT * FROM verticais').all();
+
+    const altoCount = members.filter(m => m.fit === 'Alto' || m.fit === 'Excepcional').length;
+    const medioCount = members.filter(m => m.fit === 'Médio').length;
+
+    const totalScore = members.reduce((sum, m) => sum + (m.fit_score || 0), 0);
+    const avgScore = members.length > 0 ? Math.round(totalScore / members.length) : 0;
 
     const fitSummary = {
-      altoCount: members.filter(m => m.fit === 'Alto' || m.fit === 'Excepcional').length,
-      medioCount: members.filter(m => m.fit === 'Médio').length,
-      baixoCount: members.filter(m => m.fit === 'Baixo').length,
-      avgScore: Math.round(members.reduce((sum, m) => sum + m.fit_score, 0) / (members.length || 1)),
+      totalMembers: members.length,
+      altoCount,
+      medioCount,
+      avgScore,
       pipeline: members.map(m => ({
         id: m.id,
         nome: m.nome,
         empresa: m.empresa,
         especialidade: m.especialidade,
+        vertical: m.vertical,
         gargalo: m.gargalo,
         oferta: m.oferta,
         fit: m.fit,
@@ -308,8 +335,8 @@ app.post('/api/fit/calculate', (req, res) => {
       score,
       member1: m1 ? { id: m1.id, nome: m1.nome, empresa: m1.empresa } : null,
       member2: m2 ? { id: m2.id, nome: m2.nome, empresa: m2.empresa } : null,
-      synergies,
-      jointOffer
+      jointOffer,
+      synergies
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -319,49 +346,55 @@ app.post('/api/fit/calculate', (req, res) => {
 // GET /api/grupo
 app.get('/api/grupo', (req, res) => {
   try {
-    const valores = db.prepare('SELECT * FROM grupo_valores ORDER BY num ASC').all();
-    const passos = db.prepare('SELECT * FROM grupo_passos ORDER BY num ASC').all();
-    const estrutura = db.prepare('SELECT * FROM grupo_estrutura').all();
-    const equipes = db.prepare('SELECT * FROM equipes').all();
+    const valores = [
+      { id: 1, num: 1, titulo: 'Givers Gain® (Dar para Ganhar)', descricao: 'Contribuir e ajudar outros empresários sem esperar recompensa imediata.' },
+      { id: 2, num: 2, titulo: 'Construção de Relacionamentos', descricao: 'Encontros semanais e conversas 1-2-1 favorecem laços sólidos de confiança.' },
+      { id: 3, num: 3, titulo: 'Aprendizado Contínuo', descricao: 'Capacitação constante sobre técnicas de networking e áreas dos colegas.' },
+      { id: 4, num: 4, titulo: 'Tradição e Inovação', descricao: '41 anos de metodologia comprovada com constante evolução tecnológica.' },
+      { id: 5, num: 5, titulo: 'Atitude Positiva', descricao: 'Entusiasmo e postura construtiva em todas as reuniões e contatos.' },
+      { id: 6, num: 6, titulo: 'Responsabilidade & Prestação de Contas', descricao: 'Acompanhamento rigoroso de presença, indicações e negócios fechados.' },
+      { id: 7, num: 7, titulo: 'Reconhecimento', descricao: 'Celebração pública das conquistas e contribuições de cada integrante.' }
+    ];
 
-    res.json({
-      origem: {
-        fundador: "Dr. Ivan Misner",
-        ano: 1985,
-        historia: "Há 41 anos, após perder seu principal cliente de consultoria, o Dr. Ivan Misner reuniu amigos empresários em um jantar para trocar indicações de negócios. Ali nasceu o BNI."
-      },
-      vcr: [
-        { fase: "Visibilidade", desc: "Aparecer semanalmente nas reuniões e apresentar seu negócio com clareza." },
-        { fase: "Credibilidade", desc: "Demonstrar pontualidade, ética e entregar resultados excelentes para os clientes indicados." },
-        { fase: "Rentabilidade", desc: "Colher referências de alto valor e negócios fechados de forma contínua." }
-      ],
-      valores,
-      passos,
-      estrutura,
-      equipes
-    });
+    const vcr = [
+      { fase: 'Visibilidade', desc: 'Ser visto e conhecido pelos demais membros nas reuniões e pitches.' },
+      { fase: 'Credibilidade', desc: 'Demonstrar competência técnica e cumprir compromissos assiduamente.' },
+      { fase: 'Rentabilidade', desc: 'Passo natural onde as indicações qualificadas se convertem em faturamento real.' }
+    ];
+
+    const passos = [
+      { id: 1, num: 1, titulo: 'Networking Livre & Conexão Inicial', descricao: 'Recepção dos membros e visitantes com café e troca informal de contatos.' },
+      { id: 2, num: 2, titulo: 'Abertura Oficial & Apresentação do BNI', descricao: 'Propósito da reunião, filosofia Givers Gain® e boas-vindas da presidência.' },
+      { id: 3, num: 3, titulo: 'Pitches Semanal dos Membros (30-60s)', descricao: 'Cada integrante apresenta seu negócio e solicita o perfil exato de cliente desejado.' },
+      { id: 4, num: 4, titulo: 'Apresentação Principal da Semana (10 min)', descricao: 'Destaque aprofundado do portfólio de um membro da equipe.' },
+      { id: 5, num: 5, titulo: 'Passagem de Referências & Obrigado por Negócio Fechado (OBNF)', descricao: 'Momento auge onde os membros entregam indicações e reportam faturamento gerado.' },
+      { id: 6, num: 6, titulo: 'Anúncios, Orientação de Visitantes e Encerramento', descricao: 'Fechamento com orientações aos convidados e próximos passos.' }
+    ];
+
+    const estrutura = [
+      { id: 'pres', cargo: 'Presidente', descricao: 'Lidera as reuniões semanais, coordena o comitê executivo e garante o padrão metodológico.', responsavel: 'Presidência' },
+      { id: 'vice', cargo: 'Vice-Presidente', descricao: 'Gerencia o comitê de membros, acompanha frequência e contabiliza referências e OBNF.', responsavel: 'Vice-Presidência' },
+      { id: 'secr', cargo: 'Secretário-Tesoureiro', descricao: 'Administra as finanças da equipe, mensalidades do local e relatórios administrativos.', responsavel: 'Secretaria' },
+      { id: 'anfitria', cargo: 'Anfitriões de Visitantes', descricao: 'Recepcionam convidados no café da manhã e orientam empresários visitantes.', responsavel: 'Recepção & Hospedagem' },
+      { id: 'educ', cargo: 'Coordenador de Educação', descricao: 'Ministra pílulas educativas de networking profissional no início das reuniões.', responsavel: 'Capacitação' },
+      { id: 'eventos', cargo: 'Coordenador de Eventos', descricao: 'Organiza rodadas externas de negócios, jantares festivos e 1-2-1s coletivos.', responsavel: 'Integração' }
+    ];
+
+    res.json({ valores, vcr, passos, estrutura });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Serve Static React Build
-const distPath = path.join(__dirname, '../dist');
-app.use(express.static(distPath));
-
-// Fallback for HTML routes & SPA paths
+// Fallback to SPA for any non-API routes
 app.use((req, res, next) => {
   if (req.method === 'GET' && !req.path.startsWith('/api')) {
-    res.sendFile(path.join(distPath, 'index.html'), (err) => {
-      if (err) {
-        res.sendFile(path.join(__dirname, '../index.html'));
-      }
-    });
+    res.sendFile(path.join(__dirname, '../dist/index.html'));
   } else {
     next();
   }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`BNI KeyCore Dashboard Server running on http://0.0.0.0:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
 });

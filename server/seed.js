@@ -1,6 +1,7 @@
 const db = require('./db');
 
 function seedData() {
+  db.exec('DROP TABLE IF EXISTS reunioes');
   db.exec('DROP TABLE IF EXISTS member_redes');
   db.exec('DROP TABLE IF EXISTS membro_publico');
   db.exec('DROP TABLE IF EXISTS graph_edges');
@@ -77,6 +78,19 @@ function seedData() {
       target TEXT NOT NULL,
       tipo TEXT NOT NULL,
       label TEXT
+    );
+
+    CREATE TABLE reunioes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      indicador_id TEXT NOT NULL,
+      contato_id TEXT NOT NULL,
+      data_hora DATETIME NOT NULL,
+      local TEXT NOT NULL,
+      status TEXT DEFAULT 'Agendada',
+      observacao TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (indicador_id) REFERENCES members(id),
+      FOREIGN KEY (contato_id) REFERENCES members(id)
     );
   `);
 
@@ -366,7 +380,25 @@ function seedData() {
   insertEdge.run('rodrigo', 'pedro', 'sinergia', 'BPO Financeiro + Contabilidade');
   insertEdge.run('andressa', 'tatiana', 'sinergia', 'Ergonomia/SST + Trabalhista');
 
-  console.log('Database seeded and schema synchronized!');
+  // SEED THE FIRST MEETING & REFERRAL RECORD (User's Exact Example!)
+  const insertReuniao = db.prepare(`
+    INSERT INTO reunioes (indicador_id, contato_id, data_hora, local, status, observacao)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `);
+
+  insertReuniao.run(
+    'luiz',
+    'felipe',
+    '2026-10-06 14:00:00',
+    'Real Plural — Recife Antigo',
+    'Agendada',
+    'Luiz da Colisio indicou/passou o contato para Felipe Gomes (Prudential Seguros). Reunião de negócios agendada para terça-feira às 14h no Real Plural (Recife Antigo).'
+  );
+
+  // Add the edge to the graph as well!
+  insertEdge.run('luiz', 'felipe', 'reuniao', 'Reunião 1-2-1 / Indicação: Terça 14h @ Real Plural');
+
+  console.log('Database seeded with complete schema and user example meeting!');
 }
 
 seedData();
