@@ -1,23 +1,50 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Members from './pages/Members';
-import Graph from './pages/Graph';
-import Fit from './pages/Fit';
-import Estrutura from './pages/Estrutura';
+import React, { useState, useEffect } from 'react';
+import { Navigation } from './components/Navigation';
+import { Dashboard } from './pages/Dashboard';
+import { MembersView } from './pages/MembersView';
+import { GraphView } from './pages/GraphView';
+import { FitAnalysis } from './pages/FitAnalysis';
+import { GroupGuide } from './pages/GroupGuide';
 
-const App = () => {
+export const App = () => {
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+
+  useEffect(() => {
+    const onPopState = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  const renderPage = () => {
+    const path = currentPath.toLowerCase();
+
+    if (path.includes('/membros') || path.includes('/membros.html')) {
+      return <MembersView />;
+    }
+    if (path.includes('/grafo') || path.includes('/grafo.html')) {
+      return <GraphView />;
+    }
+    if (path.includes('/fit') || path.includes('/fit.html')) {
+      return <FitAnalysis />;
+    }
+    if (path.includes('/grupo') || path.includes('/grupo.html')) {
+      return <GroupGuide />;
+    }
+    return <Dashboard onNavigate={(newPath) => {
+      setCurrentPath(newPath);
+      window.history.pushState({}, '', newPath);
+    }} />;
+  };
+
   return (
-    <Router>
-      <div style={{ padding: '20px' }}>
-        <h1>BNI KeyCore Dashboard</h1>
-        <Routes>
-          <Route path="/members" element={<Members />} />
-          <Route path="/graph" element={<Graph />} />
-          <Route path="/fit" element={<Fit />} />
-          <Route path="/grupo/estrutura" element={<Estrutura />} />   {/* Nova rota */}
-        </Routes>
-      </div>
-    </Router>
+    <div className="app-shell">
+      <Navigation currentPath={currentPath} setPath={setCurrentPath} />
+      <main className="main-content">
+        {renderPage()}
+      </main>
+    </div>
   );
 };
 
