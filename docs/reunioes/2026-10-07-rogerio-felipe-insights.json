@@ -1,0 +1,47 @@
+{
+  "data": "2026-10-07",
+  "tipo": "reuniao_1_2_1",
+  "participantes": [
+    "Rogério Alencar Filho",
+    "Felipe Gomes"
+  ],
+  "origem_contato": "Luiz",
+  "status_bni": "Em avaliação; entrada não formalmente decidida",
+  "insights": [
+    "Começar a narrativa comercial pelo gargalo operacional e pelo tempo recuperado.",
+    "Usar o BNI para complementar vendas, relacionamento e escala comercial.",
+    "Registrar a cadeia de indicação Luiz → Felipe → Rogério no grafo.",
+    "Medir o retorno do BNI por reuniões, indicações, oportunidades, conversões, receita e horas investidas.",
+    "Manter o pitch da KeyCore amplo, porém concreto: tecnologia aplicada a gargalos operacionais."
+  ],
+  "oportunidades": [
+    "Parcerias e indicações qualificadas via BNI.",
+    "Mapeamento de membros com competências comerciais complementares.",
+    "Demonstração de casos de automação com tempo economizado.",
+    "Evolução do dashboard para acompanhamento de ROI do BNI."
+  ],
+  "riscos": [
+    "Conflito entre compromisso semanal do BNI e agenda operacional da KeyCore.",
+    "Decisão sem critérios claros de frequência, substituição e retorno esperado.",
+    "Exposição indevida de dados pessoais, médicos, familiares ou financeiros.",
+    "Uso público de números da transcrição sem confirmação."
+  ],
+  "acoes": [
+    {
+      "responsavel": "Rogério",
+      "acao": "Avaliar a entrada no BNI considerando presença obrigatória e retorno esperado.",
+      "status": "pendente"
+    },
+    {
+      "responsavel": "KeyCore",
+      "acao": "Acompanhar origem e resultado das indicações no grafo e no histórico de reuniões.",
+      "status": "pendente"
+    },
+    {
+      "responsavel": "KeyCore",
+      "acao": "Definir e implementar indicadores de ROI do BNI.",
+      "status": "pendente"
+    }
+  ],
+  "privacidade": "Dados pessoais sensíveis foram excluídos do registro operacional do projeto."
+}
