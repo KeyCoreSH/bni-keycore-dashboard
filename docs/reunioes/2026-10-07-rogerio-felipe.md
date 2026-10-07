@@ -64,8 +64,8 @@ A conversa apresentou a KeyCore, sua proposta de devolver tempo por meio de tecn
 - **Plataforma visível:** Google Meet
 - **Horário exibido na captura:** 14:41
 - **Código da reunião:** `zqy-gpef-exa`
-- **Participantes visíveis:** Felipe Gomes, Rogerio Alencar Filho e Sintessy Bot
-- **Estados observáveis:** Felipe e Rogerio aparecem com vídeo; o Sintessy Bot aparece sem vídeo e com microfone silenciado. A imagem não permite afirmar o estado absoluto dos microfones de Felipe e Rogerio.
+- **Participantes visíveis:** Felipe Gomes, Rogerio Alencar Filho e Sintesy Bot
+- **Estados observáveis:** Felipe e Rogerio aparecem com vídeo; o Sintesy Bot aparece sem vídeo e com microfone silenciado. A imagem não permite afirmar o estado absoluto dos microfones de Felipe e Rogerio.
 - **Data e duração:** não aparecem na captura; não foram inferidas.
 
 ## Correções aplicadas à transcrição

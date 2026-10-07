@@ -39,16 +39,19 @@ const reuniaoAnexo = {
 
 // Keep the verified meeting screenshot linked to the existing meeting record.
 try {
-  db.prepare(`UPDATE reunioes SET anexo_path = ?, anexo_tipo = ?, anexo_descricao = ?, plataforma = ?, codigo_reuniao = ?, horario_exibido = ?, participantes_visiveis = ?, estados_participantes = ? WHERE id = 1`)
+  db.prepare(`UPDATE reunioes SET data_hora = ?, local = ?, status = ?, anexo_path = ?, anexo_tipo = ?, anexo_descricao = ?, plataforma = ?, codigo_reuniao = ?, horario_exibido = ?, participantes_visiveis = ?, estados_participantes = ? WHERE id = 1`)
     .run(
+      '2026-10-07 14:41:00',
+      'Google Meet — reunião Rogério e Felipe',
+      'Realizada',
       reuniaoAnexo.path,
       reuniaoAnexo.tipo,
       reuniaoAnexo.descricao,
       'Google Meet',
       'zqy-gpef-exa',
       '14:41',
-      'Felipe Gomes; Rogerio Alencar Filho; Sintessy Bot',
-      'Felipe e Rogerio com vídeo visível; Sintessy Bot sem vídeo e microfone silenciado. Não inferir estado absoluto dos microfones de Felipe e Rogerio a partir da imagem.'
+      'Felipe Gomes; Rogerio Alencar Filho; Sintesy Bot',
+      'Felipe e Rogerio com vídeo visível; Sintesy Bot sem vídeo e microfone silenciado. Não inferir estado absoluto dos microfones de Felipe e Rogerio a partir da imagem.'
     );
 } catch (err) {
   console.warn('Anexo da reunião ainda não foi vinculado:', err.message);
