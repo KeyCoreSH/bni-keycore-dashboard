@@ -4,6 +4,9 @@
   "description": "Este projeto é um dashboard para visualizar, gerenciar e entender a estrutura e os membros do grupo empresarial BNI JUNTOS. Ele foi desenvolvido em React e utiliza bibliotecas modernas para interatividade e componentes reutilizáveis.",
   "main": "index.js",
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "start": "node server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

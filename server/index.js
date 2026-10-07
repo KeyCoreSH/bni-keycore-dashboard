@@ -10,8 +10,55 @@ const PORT = process.env.PORT || 8080;
 app.use(cors());
 app.use(bodyParser.json());
 
-// Serve static assets built by Vite in dist/
+// Serve meeting evidence before the SPA fallback so /docs returns the image.
+app.use('/docs', express.static(path.join(__dirname, '../docs')));
+// Serve static assets built by Vite in dist/.
 app.use(express.static(path.join(__dirname, '../dist')));
+
+// Add columns introduced after the initial SQLite schema without destroying data.
+for (const statement of [
+  'ALTER TABLE reunioes ADD COLUMN anexo_path TEXT',
+  'ALTER TABLE reunioes ADD COLUMN anexo_tipo TEXT',
+  'ALTER TABLE reunioes ADD COLUMN anexo_descricao TEXT',
+  'ALTER TABLE reunioes ADD COLUMN plataforma TEXT',
+  'ALTER TABLE reunioes ADD COLUMN codigo_reuniao TEXT',
+  'ALTER TABLE reunioes ADD COLUMN horario_exibido TEXT',
+  'ALTER TABLE reunioes ADD COLUMN participantes_visiveis TEXT',
+  'ALTER TABLE reunioes ADD COLUMN estados_participantes TEXT'
+]) {
+  try { db.exec(statement); } catch (err) {
+    if (!String(err.message).includes('duplicate column name')) throw err;
+  }
+}
+
+const reuniaoAnexo = {
+  path: '/docs/reunioes/2026-10-07-rogerio-felipe-imagem.jpg',
+  tipo: 'image/jpeg',
+  descricao: 'Captura do Google Meet: 3 participantes visíveis, código zqy-gpef-exa e horário exibido 14:41.'
+};
+
+// Keep the verified meeting screenshot linked to the existing meeting record.
+try {
+  db.prepare(`UPDATE reunioes SET anexo_path = ?, anexo_tipo = ?, anexo_descricao = ?, plataforma = ?, codigo_reuniao = ?, horario_exibido = ?, participantes_visiveis = ?, estados_participantes = ? WHERE id = 1`)
+    .run(
+      reuniaoAnexo.path,
+      reuniaoAnexo.tipo,
+      reuniaoAnexo.descricao,
+      'Google Meet',
+      'zqy-gpef-exa',
+      '14:41',
+      'Felipe Gomes; Rogerio Alencar Filho; Sintessy Bot',
+      'Felipe e Rogerio com vídeo visível; Sintessy Bot sem vídeo e microfone silenciado. Não inferir estado absoluto dos microfones de Felipe e Rogerio a partir da imagem.'
+    );
+} catch (err) {
+  console.warn('Anexo da reunião ainda não foi vinculado:', err.message);
+}
+
+app.get('/api/reunioes/:id/anexo', (req, res) => {
+  const row = db.prepare('SELECT anexo_path, anexo_tipo, anexo_descricao FROM reunioes WHERE id = ?').get(req.params.id);
+  if (!row || !row.anexo_path) return res.status(404).json({ error: 'Anexo não encontrado' });
+  res.json({ ...row, url: row.anexo_path });
+});
 
 // Authentication Endpoint
 app.post('/api/login', (req, res) => {
@@ -224,7 +271,15 @@ app.get('/api/reunioes', (req, res) => {
         m1.especialidade as indicador_especialidade,
         m2.nome as contato_nome,
         m2.empresa as contato_empresa,
-        m2.especialidade as contato_especialidade
+        m2.especialidade as contato_especialidade,
+        r.anexo_path,
+        r.anexo_tipo,
+        r.anexo_descricao,
+        r.plataforma,
+        r.codigo_reuniao,
+        r.horario_exibido,
+        r.participantes_visiveis,
+        r.estados_participantes
       FROM reunioes r
       JOIN members m1 ON r.indicador_id = m1.id
       JOIN members m2 ON r.contato_id = m2.id

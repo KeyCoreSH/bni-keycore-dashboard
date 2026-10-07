@@ -9,7 +9,7 @@ export const MeetingsView = () => {
   // Form state
   const [indicadorId, setIndicadorId] = useState('luiz');
   const [contatoId, setContatoId] = useState('felipe');
-  const [dataHora, setDataHora] = useState('2026-10-06T14:00');
+  const [dataHora, setDataHora] = useState('2026-10-07T14:41');
   const [local, setLocal] = useState('Real Plural — Recife Antigo');
   const [status, setStatus] = useState('Agendada');
   const [observacao, setObservacao] = useState('');
@@ -147,6 +147,20 @@ export const MeetingsView = () => {
                   {r.observacao && (
                     <div style={{ marginTop: '12px', padding: '10px', background: 'var(--slate-50)', borderRadius: '8px', fontSize: '0.85rem', color: 'var(--slate-700)' }}>
                       <strong>Observações / Contexto:</strong> {r.observacao}
+                    </div>
+                  )}
+
+                  {r.anexo_path && (
+                    <div style={{ marginTop: '12px', padding: '12px', background: 'var(--blue-50)', borderRadius: '8px', border: '1px solid var(--blue-200)' }}>
+                      <strong style={{ display: 'block', marginBottom: '8px' }}>Evidência anexada</strong>
+                      {r.plataforma && <div style={{ fontSize: '0.85rem' }}>Plataforma: {r.plataforma}</div>}
+                      {r.codigo_reuniao && <div style={{ fontSize: '0.85rem' }}>Código: <code>{r.codigo_reuniao}</code></div>}
+                      {r.horario_exibido && <div style={{ fontSize: '0.85rem' }}>Horário visível: {r.horario_exibido}</div>}
+                      {r.participantes_visiveis && <div style={{ fontSize: '0.85rem' }}>Participantes: {r.participantes_visiveis}</div>}
+                      {r.estados_participantes && <div style={{ fontSize: '0.8rem', marginTop: '4px', color: 'var(--slate-600)' }}>{r.estados_participantes}</div>}
+                      <a href={r.anexo_path} target="_blank" rel="noreferrer" style={{ display: 'inline-block', marginTop: '8px', fontWeight: 700 }}>
+                        Abrir imagem da reunião
+                      </a>
                     </div>
                   )}
                 </div>

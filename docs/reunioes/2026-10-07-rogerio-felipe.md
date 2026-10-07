@@ -58,6 +58,16 @@ A conversa apresentou a KeyCore, sua proposta de devolver tempo por meio de tecn
 - **KeyCore:** definir indicadores de ROI do BNI: reuniões, indicações recebidas/enviadas, oportunidades, conversões, receita e horas investidas.
 - **Felipe e Rogério:** conduzir o acompanhamento particular de planejamento financeiro fora do sistema BNI/KeyCore, preservando dados pessoais.
 
+## Evidência visual anexada
+
+- **Arquivo:** `2026-10-07-rogerio-felipe-imagem.jpg`
+- **Plataforma visível:** Google Meet
+- **Horário exibido na captura:** 14:41
+- **Código da reunião:** `zqy-gpef-exa`
+- **Participantes visíveis:** Felipe Gomes, Rogerio Alencar Filho e Sintessy Bot
+- **Estados observáveis:** Felipe e Rogerio aparecem com vídeo; o Sintessy Bot aparece sem vídeo e com microfone silenciado. A imagem não permite afirmar o estado absoluto dos microfones de Felipe e Rogerio.
+- **Data e duração:** não aparecem na captura; não foram inferidas.
+
 ## Correções aplicadas à transcrição
 
 - “Kicore” → **KeyCore**
